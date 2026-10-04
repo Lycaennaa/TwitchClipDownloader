@@ -4,6 +4,17 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (without the v prefix)
+        required: true
+        type: string
+      publish:
+        description: Publish now; immutable releases cannot be deleted
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -14,9 +25,10 @@ jobs:
 
   release:
     name: Release
-    if: startsWith(github.ref, 'refs/tags/v')
     needs: test
     runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
     permissions:
       contents: write
       id-token: write
@@ -24,8 +36,6 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Validate release version
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
         run: |
           node --input-type=module <<'NODE'
           import { readFileSync } from 'node:fs';
@@ -40,17 +50,27 @@ jobs:
             );
           }
           NODE
-      - name: Package extension
-        run: zip -r twitch-clip-bulk-downloader.zip manifest.json src -x '*/.DS_Store'
+      - name: Package Chrome extension
+        run: |
+          set -euo pipefail
+          archive=twitch-clip-bulk-downloader-chrome.zip
+          zip -r "$archive" manifest.json src -x '*/.DS_Store'
+          unzip -t "$archive"
+          unzip -Z1 "$archive" > "$RUNNER_TEMP/chrome-extension-files.txt"
+          grep -Fxq manifest.json "$RUNNER_TEMP/chrome-extension-files.txt"
       - name: Generate SHA-256 checksums
-        run: sha256sum twitch-clip-bulk-downloader.zip > SHA256SUMS
+        run: sha256sum twitch-clip-bulk-downloader-chrome.zip > SHA256SUMS
       - name: Attest release artifact
+        if: github.event.repository.visibility == 'public'
         uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
         with:
-          subject-path: twitch-clip-bulk-downloader.zip
-      - name: Publish GitHub release
+          subject-path: twitch-clip-bulk-downloader-chrome.zip
+      - name: Create draft GitHub release
         uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          target_commitish: ${{ github.sha }}
+          draft: true
           generate_release_notes: true
           body: |
             ## Verify release artifacts
@@ -61,12 +81,18 @@ jobs:
             sha256sum --check SHA256SUMS
             ```
 
-            Verify GitHub build provenance (requires GitHub CLI):
+            Verify GitHub build provenance when available (requires GitHub CLI):
 
-            ```sh
-            gh attestation verify twitch-clip-bulk-downloader.zip --repo ${{ github.repository }}
-            ```
+            ${{ github.event.repository.visibility == 'public' && format('`gh attestation verify twitch-clip-bulk-downloader-chrome.zip --repo {0}`', github.repository) || 'Not generated for this private repository.' }}
           files: |
-            twitch-clip-bulk-downloader.zip
+            twitch-clip-bulk-downloader-chrome.zip
             SHA256SUMS
           fail_on_unmatched_files: true
+      - name: Publish immutable release
+        if: github.event_name == 'push' || inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        run: |
+          release_id=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq .id)
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/releases/${release_id}" --field draft=false > /dev/null
