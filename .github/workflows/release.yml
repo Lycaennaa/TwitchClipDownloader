@@ -65,7 +65,18 @@ jobs:
         uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
         with:
           subject-path: twitch-clip-bulk-downloader-chrome.zip
+      - name: Find existing draft release
+        id: existing_draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        run: |
+          set -euo pipefail
+          release_id="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" --jq '.[] | select(.tag_name == env.RELEASE_TAG and .draft) | .id')"
+          printf 'id=%s\n' "$release_id" >> "$GITHUB_OUTPUT"
       - name: Create draft GitHub release
+        id: draft_release
+        if: steps.existing_draft.outputs.id == ''
         uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
@@ -93,6 +104,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          RELEASE_ID: ${{ steps.existing_draft.outputs.id || steps.draft_release.outputs.id }}
         run: |
-          release_id=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq .id)
-          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/releases/${release_id}" --field draft=false > /dev/null
+          set -euo pipefail
+          if [[ -z "$RELEASE_ID" ]]; then
+            printf 'No draft release found for %s\n' "$RELEASE_TAG" >&2
+            exit 1
+          fi
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}" --field draft=false > /dev/null
