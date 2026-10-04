@@ -1,0 +1,1 @@
+Update manifest.json and package.json version after everything completed.

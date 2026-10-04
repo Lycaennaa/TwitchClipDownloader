@@ -1,0 +1,209 @@
+#tcd-toolbar-button {
+  position: fixed;
+  top: 8px;
+  right: 64px;
+  z-index: 2147483647;
+  min-height: 32px;
+  border: 0;
+  border-radius: 4px;
+  padding: 0 12px;
+  background: #9147ff;
+  color: white;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
+  cursor: pointer;
+  font: 600 13px/1 Inter, system-ui, sans-serif;
+}
+
+#tcd-toolbar-button:hover,
+#tcd-toolbar-button:focus-visible {
+  background: #772ce8;
+}
+
+.tcd-toolbar-anchor {
+  position: relative !important;
+}
+
+.tcd-toolbar-anchor > #tcd-toolbar-button {
+  position: absolute;
+  top: 0;
+  right: auto;
+  left: calc(100% + 8px);
+}
+
+#tcd-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483647;
+  width: 320px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+  border: 1px solid #4b367c;
+  border-radius: 8px;
+  background: #18181b;
+  color: #efeff1;
+  box-shadow: 0 8px 30px rgb(0 0 0 / 45%);
+  font: 13px/1.4 Inter, system-ui, sans-serif;
+}
+
+#tcd-panel * {
+  box-sizing: border-box;
+}
+
+#tcd-panel[hidden] {
+  display: none;
+}
+
+#tcd-panel #tcd-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: -8px -8px 2px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+}
+
+#tcd-panel #tcd-panel-header:focus-visible {
+  outline: 2px solid #bf94ff;
+  outline-offset: 1px;
+}
+
+#tcd-panel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+#tcd-panel #tcd-close {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: #adadb8;
+  font-size: 22px;
+  line-height: 1;
+}
+
+#tcd-panel #tcd-close:hover,
+#tcd-panel #tcd-close:focus-visible {
+  background: #3a3a3d;
+  color: white;
+}
+
+#tcd-panel p {
+  margin: 8px 0;
+}
+
+#tcd-panel #tcd-folder-status {
+  margin-top: -6px;
+  color: #adadb8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#tcd-panel .tcd-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+#tcd-panel label {
+  flex: 1;
+  color: #adadb8;
+  font-size: 12px;
+}
+
+#tcd-panel select,
+#tcd-panel button {
+  width: 100%;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 4px;
+  padding: 8px;
+  font: inherit;
+}
+
+#tcd-panel select {
+  background: #3a3a3d;
+  color: #efeff1;
+}
+
+#tcd-panel button {
+  cursor: pointer;
+  background: #9147ff;
+  color: white;
+  font-weight: 600;
+}
+
+#tcd-panel button.tcd-secondary {
+  background: #3a3a3d;
+}
+
+#tcd-panel button.tcd-danger {
+  background: #eb0400;
+}
+
+#tcd-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+#tcd-status,
+#tcd-progress {
+  color: #adadb8;
+}
+
+#tcd-download-progress {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+#tcd-download-progress[hidden] {
+  display: none;
+}
+
+#tcd-panel .tcd-download-label {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 3px;
+  color: #dedee3;
+  font-size: 12px;
+}
+
+#tcd-panel .tcd-download-label span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#tcd-panel .tcd-download-label span:last-child {
+  color: #adadb8;
+  overflow-wrap: anywhere;
+}
+
+#tcd-panel progress {
+  display: block;
+  width: 100%;
+  height: 8px;
+  accent-color: #9147ff;
+}
+
+#tcd-warning {
+  color: #ffb31a;
+}
+
+#tcd-error {
+  color: #ff8280;
+  word-break: break-word;
+}

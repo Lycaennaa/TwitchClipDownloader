@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Twitch Clip Bulk Downloader",
+  "version": "0.2.14",
+  "description": "Bulk-download clips from Twitch Creator Dashboard.",
+  "permissions": ["alarms", "downloads", "storage"],
+  "host_permissions": ["https://*.twitch.tv/*", "https://*.twitchcdn.net/*", "https://d1ndex63qxojbr.cloudfront.net/*"],
+  "options_ui": {
+    "page": "src/file-system.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://dashboard.twitch.tv/u/*/content/clips/created*"],
+      "js": ["src/clip-data.js", "src/page-hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://dashboard.twitch.tv/u/*/content/clips/created*"],
+      "css": ["src/content.css"],
+      "js": ["src/content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  }
+}

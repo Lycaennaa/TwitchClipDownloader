@@ -1,0 +1,54 @@
+name: CI and Release
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run check
+
+  release:
+    name: Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate release version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+
+          const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'));
+          const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+          const expectedTag = `v${manifest.version}`;
+
+          if (manifest.version !== packageJson.version || process.env.RELEASE_TAG !== expectedTag) {
+            throw new Error(
+              `Release tag and extension versions must match: tag=${process.env.RELEASE_TAG}, manifest=${manifest.version}, package=${packageJson.version}`,
+            );
+          }
+          NODE
+      - name: Package extension
+        run: zip -r twitch-clip-bulk-downloader.zip manifest.json src -x '*/.DS_Store'
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: twitch-clip-bulk-downloader.zip
+          fail_on_unmatched_files: true

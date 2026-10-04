@@ -1,0 +1,10 @@
+{
+  "name": "twitch-clip-bulk-downloader",
+  "version": "0.2.14",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/clip-data.js && node --check src/file-system.js && node --check src/download-file-system.js && node --check src/file-system-page.js && node --check src/page-hook.js && node --check src/content.js && node --check src/background.js && node --test",
+    "test": "node --test"
+  }
+}

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Twitch Clip Downloader Folder Access</title>
+  <style>
+    :root { color-scheme: dark; font: 16px/1.45 system-ui, sans-serif; background: #0e0e10; color: #efeff1; }
+    body { max-width: 760px; margin: 0 auto; padding: 32px 20px; }
+    section { margin: 20px 0; padding: 20px; border: 1px solid #3a3a3d; border-radius: 10px; background: #18181b; }
+    label { display: block; margin: 14px 0; }
+    input { box-sizing: border-box; width: 100%; margin-top: 6px; padding: 9px; color: inherit; background: #0e0e10; border: 1px solid #5c5c60; border-radius: 5px; }
+    button { margin: 6px 8px 6px 0; padding: 9px 14px; border: 0; border-radius: 5px; font-weight: 700; cursor: pointer; }
+    button:disabled { cursor: default; opacity: .5; }
+    .primary { background: #9147ff; color: white; }
+    .danger { background: #eb0400; color: white; }
+    #status { white-space: pre-wrap; }
+    #error { color: #ff8280; }
+  </style>
+</head>
+<body>
+  <h1>Download folder access</h1>
+  <p>Downloads stream directly into creator folders under the selected Twitch Clips folder.</p>
+  <section>
+    <h2>1. Select root folder</h2>
+    <p>Select the folder containing creator subdirectories. The directory handle is stored in extension IndexedDB. If using Brave > new tab > brave://flags > type "file-system-access-api" then click default then change to enable then relaunch browser. </p>
+    <button id="select-root" class="primary">Select folder</button>
+    <button id="inspect-root">Inspect stored folder</button>
+  </section>
+  <section>
+    <h2>2. Test streaming</h2>
+    <p>Optional diagnostic: write a temporary file into an existing creator directory, then remove it. Use a current Twitch media URL from the dashboard.</p>
+    <label>Creator directory
+      <input id="creator-directory" autocomplete="off" placeholder="channel-login">
+    </label>
+    <label>Twitch media URL
+      <input id="media-url" type="url" autocomplete="off" placeholder="https://production.assets.clips.twitchcdn.net/…">
+    </label>
+    <button id="run-probe" class="primary">Run stream test</button>
+    <button id="cancel-probe" class="danger" disabled>Cancel</button>
+  </section>
+  <section>
+    <h2>Status</h2>
+    <p id="status">Loading…</p>
+    <p id="error" hidden></p>
+  </section>
+  <script src="file-system.js"></script>
+  <script src="file-system-page.js"></script>
+</body>
+</html>
