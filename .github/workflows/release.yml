@@ -58,8 +58,6 @@ jobs:
           unzip -t "$archive"
           unzip -Z1 "$archive" > "$RUNNER_TEMP/chrome-extension-files.txt"
           grep -Fxq manifest.json "$RUNNER_TEMP/chrome-extension-files.txt"
-      - name: Generate SHA-256 checksums
-        run: sha256sum twitch-clip-bulk-downloader-chrome.zip > SHA256SUMS
       - name: Attest release artifact
         if: github.event.repository.visibility == 'public'
         uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
@@ -86,18 +84,13 @@ jobs:
           body: |
             ## Verify release artifacts
 
-            Verify the downloaded ZIP checksum:
-
-            ```sh
-            sha256sum --check SHA256SUMS
-            ```
+            GitHub publishes a SHA-256 digest for each release asset. Compare the Chrome ZIP with the digest shown on the release page.
 
             Verify GitHub build provenance when available (requires GitHub CLI):
 
             ${{ github.event.repository.visibility == 'public' && format('`gh attestation verify twitch-clip-bulk-downloader-chrome.zip --repo {0}`', github.repository) || 'Not generated for this private repository.' }}
           files: |
             twitch-clip-bulk-downloader-chrome.zip
-            SHA256SUMS
           fail_on_unmatched_files: true
       - name: Publish immutable release
         if: github.event_name == 'push' || inputs.publish
