@@ -1,6 +1,6 @@
 # Twitch Clip Bulk Downloader
 
-Chrome extension for the Twitch Creator Dashboard’s **Clips Created** page (`dashboard.twitch.tv/u/.../content/clips/created`). It reads the clips shown by the dashboard and downloads their video files into a folder you choose.
+Chrome extension for the Twitch Creator Dashboard’s **Clips Created** page (`dashboard.twitch.tv/u/.../content/clips/created`). It reads the clips shown by the dashboard and downloads their video files into a folder you choose. The only network connections are to twitch.
 
 ## Requirements
 
